@@ -2,8 +2,24 @@ CC = gcc
 CFLAGS = -Wall -g
 OBJS = main.o log.o memory.o sig.o
 
-httpd: $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $(OBJS)
+SRCDIR = ./src
+SRCS = $(wildcard $(SRCDIR)/*.c)
 
-%.o: %.c
-	$(CC) -c $(CFLAGS) -o $@ $<
+OBJDIR = ./obj
+OBJS = $(addprefix $(OBJDIR)/, $(notdir $(SRCS:.c=.o)))
+
+TARGET = ./bin/httpd
+
+$(TARGET): $(OBJS)
+		-mkdir -p ./bin
+			$(CC) -o $@ $^
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+		-mkdir -p $(OBJDIR)
+			$(CC) $(CFLAGS) -o $@ -c $<
+
+all: clean $(TARGET)
+
+clean:
+		-rm -f $(OBJECTS) $(TARGET)
+
