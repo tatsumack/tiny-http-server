@@ -21,5 +21,5 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 all: clean $(TARGET)
 
 clean:
-		-rm -f $(OBJECTS) $(TARGET)
+		-rm -f $(OBJS) $(TARGET)
 
