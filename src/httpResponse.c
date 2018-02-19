@@ -12,7 +12,6 @@
 #include "log.h"
 #include "memory.h"
 
-#define SERVER_NAME "tinyHTTPServer"
 #define SERVER_VERSION "1.0"
 #define HTTP_MINOR_VERSION 0
 
@@ -25,7 +24,7 @@ static char* build_fspath(char* docroot, char* urlpath);
 static void do_file_response(struct HTTPRequest* req, FILE* out, char* docroot);
 static void not_implemented(struct HTTPRequest* req, FILE* out);
 static void output_common_header_fields(struct HTTPRequest* req, FILE* out, char* status);
-static void not_found(struct HTTPRequest* req, FILE* out);
+static void not_found(struct HTTPRequest* req, FILE* out, char* path);
 static void free_fileinfo(struct FileInfo* info);
 static char* guess_content_type(struct FileInfo* info);
 
@@ -52,7 +51,7 @@ static void do_file_response(struct HTTPRequest* req, FILE* out, char* docroot)
     {
         printf("path:%s\n", req->path);
         free_fileinfo(info);
-        not_found(req, out);
+        not_found(req, out, info->path);
         return;
     }
 
@@ -114,7 +113,7 @@ static void not_implemented(struct HTTPRequest* req, FILE* out)
     fflush(out);
 }
 
-static void not_found(struct HTTPRequest* req, FILE* out)
+static void not_found(struct HTTPRequest* req, FILE* out, char* path)
 {
     output_common_header_fields(req, out, "404 Not Found");
     fprintf(out, "Content-Type: text/html\r\n");
@@ -122,7 +121,7 @@ static void not_found(struct HTTPRequest* req, FILE* out)
     if (strcmp(req->method, "HEAD") != 0) {
         fprintf(out, "<html>\r\n");
         fprintf(out, "<header><title>Not Found</title><header>\r\n");
-        fprintf(out, "<body><p>File not found</p></body>\r\n");
+        fprintf(out, "<body><p>File not found</p>%s</body>\r\n", path);
         fprintf(out, "</html>\r\n");
     }
     fflush(out);

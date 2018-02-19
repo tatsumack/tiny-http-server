@@ -5,6 +5,8 @@
 #include <stdbool.h>
 #include "httpRequest.h"
 
+#define SERVER_NAME "TinyHTTPServer"
+
 struct FileInfo {
     char* path;
     long size;
