@@ -13,7 +13,7 @@ void log_exit(const char *fmt, ...)
     va_list ap;
 
     va_start(ap, fmt);
-    if (debug_mode)
+    if (!debug_mode)
     {
         vfprintf(stderr, fmt, ap);
         fputc('\n', stderr);
