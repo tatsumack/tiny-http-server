@@ -4,13 +4,14 @@
 #include <string.h>
 #include <signal.h>
 #include <errno.h>
+#include <sys/wait.h>
 #include "log.h"
 
 typedef void (*sighandler_t)(int);
 static void trap_signal(int sig, sighandler_t handler);
 static void signal_exit(int sig);
 static void detach_children();
-static void noop_handler(int sig);
+static void wait_handler(int sig);
 
 void install_signal_handler()
 {
@@ -35,8 +36,8 @@ static void trap_signal(int sig, sighandler_t handler)
 static void detach_children()
 {
     struct sigaction act = {
-        .sa_handler = noop_handler,
-        .sa_flags = SA_RESTART | SA_NOCLDWAIT
+        .sa_handler = wait_handler,
+        .sa_flags = SA_RESTART
     };
     sigemptyset(&act.sa_mask);
     if (sigaction(SIGCHLD, &act, NULL) < 0)
@@ -45,8 +46,9 @@ static void detach_children()
     }
 }
 
-static void noop_handler(int sig)
+static void wait_handler(int sig)
 {
+    wait(NULL);
 }
 
 static void signal_exit(int sig)
