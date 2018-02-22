@@ -64,19 +64,18 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
-    char* docroot = argv[optind];
-
-    if (do_chroot)
-    {
-        setup_environment(docroot, user, group);
-        docroot = "";
-    }
     install_signal_handler();
     int server_fd = listen_socket(port);
     if (!debug_mode)
     {
         openlog(SERVER_NAME, LOG_PID|LOG_NDELAY, LOG_DAEMON);
         become_daemon();
+    }
+    char* docroot = argv[optind];
+    if (do_chroot)
+    {
+        setup_environment(docroot, user, group);
+        docroot = "";
     }
     accept_socket(server_fd, docroot, service);
     exit(0);

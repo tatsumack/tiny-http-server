@@ -19,13 +19,25 @@ void become_daemon()
     freopen("/dev/null", "w", stdout);
     freopen("/dev/null", "w", stderr);
 
-    int n = fork();
-    if (n < 0)
+    int pid = fork();
+    if (pid < 0)
     {
         log_exit("fork(2) failed: %s", strerror(errno));
     }
-    if (n != 0)
+    if (pid != 0)
     {
+        FILE* fp = fopen("/tmp/tinyhttpd.pid", "w");
+        if (!fp)
+        {
+            log_exit("fopen(2) failed: path=%s", "/tmp/tinyhttpd.pid");
+        }
+        char ps[10];
+        sprintf(ps, "%d", pid);
+        if (fputs(ps, fp) < 0)
+        {
+            log_exit("fputs(2) failed: %s", strerror(errno));
+        }
+        fclose(fp);
         _exit(0);
     }
     if (setsid() < 0)
